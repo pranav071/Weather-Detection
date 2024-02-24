@@ -1,0 +1,47 @@
+import requests
+import json
+
+API_KEY = '616f848c20abb5b792422bd3616cd8d5'
+BASE_URL = 'http://api.openweathermap.org/data/2.5/weather?'
+
+city = input("Enter city name: ")
+
+url = BASE_URL + f'q={city}&appid={API_KEY}&units=metric'
+
+response = requests.get(url)
+
+if response.status_code == 200:
+    data = response.json()
+
+    temperature = data['main']['temp']
+    weather_description = data['weather'][0]['description']
+    humidity = data['main']['humidity']
+    wind_speed = data['wind']['speed']
+
+    if 'rain' in data:
+        rain = data['rain'].get('1h', 0)  
+
+    if 'alerts' in data:
+        alerts = data['alerts']
+        print("Weather Alerts:")
+        for alert in alerts:
+            event = alert.get('event', 'N/A')
+            description = alert.get('description', 'N/A')
+            start_time = alert.get('start', 'N/A')
+            end_time = alert.get('end', 'N/A')
+            print(f"Event: {event}")
+            print(f"Description: {description}")
+            print(f"Start Time: {start_time}")
+            print(f"End Time: {end_time}")
+            print("\n")
+
+    print(f'City: {city}')
+    print(f'Temperature: {temperature}°C')
+    print(f'Weather: {weather_description}')
+    print(f'Humidity: {humidity}%')
+    print(f'Wind Speed: {wind_speed} m/s')
+    
+    if 'rain' in data:
+        print(f'Rain in the next hour: {rain} mm')
+else:
+    print("Error: Unable to fetch data from the API.")
